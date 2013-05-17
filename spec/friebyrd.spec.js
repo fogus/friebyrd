@@ -97,6 +97,68 @@ describe("friebyrd", function() {
             });
             
         });
+        
+        describe("choice", function() {
+            it("succeeds (non-empty substitutions) if the element is a member of the list", function() {
+                var c = F.run(F.choice(2, [1,2,3]));
+                expect(c.length).toEqual(1);
+                expect(c[0].binds).toEqual({});
+            });
+        
+            it("fails (empty substitutions) if the element is not a member of the list", function() {
+                var c = F.run(F.choice(10, [1,2,3]));
+                expect(c).toEqual([]);
+            });
+            
+            it("returns a list of bindings that an lvar can take in the list", function() {
+                var q = F.lvar("q");
+                var c = F.run(F.choice(q, [1,2,3]));
+                expect(c.length).toEqual(3);
+                _.each(c, function(ch, i) {
+                    expect(ch.binds).toEqual({q: i+1});
+                });
+            });
+        });
+        
+        describe("commono", function() {
+            it("returns an lvar bound to the common element of two lists", function() {
+                var c = F.run(F.commono([1,2,3], [3,4,5]));
+                expect(c[0].binds).toEqual({x: 3}); 
+            });
+            
+            it("returns bindings of an lvar to multiple common elements of two lists", function() {
+                var c = F.run(F.commono([1,2,3], [3,4,1,7]));
+                expect(c.length).toBe(2);
+                expect(c[0].binds).toEqual({x: 1}); 
+                expect(c[1].binds).toEqual({x: 3}); 
+            });
+            
+            it("returns an empty list if there are no common elements", function() {
+                var c = F.run(F.commono([11,2,3], [13, 4, 1, 7]));
+                expect(c).toEqual([]); 
+            });
+            
+        });
+        
+        describe("conso", function() {
+            it("conso(a, b, l) succeeds if in the current state of the world, cons(a, b) is the same as l.", function() {
+                var c = F.run(F.conso(1, [2, 3], [1,2,3]));
+                expect(c[0].binds).toEqual({});
+            });
+            
+            it("may bing lvar to the list", function() {
+                var q = F.lvar("q");
+                var c = F.run(F.conso(1, [2, 3], q));
+                expect(c[0].binds).toEqual({q: [1,2,3]});
+            });
+            
+            it("may bind lvar to a or b", function() {
+                var q = F.lvar("q");
+                var p = F.lvar("p");
+                var c = F.run(F.conso(q, p, [1,2,3]));
+                expect(c[0].binds).toEqual({q: [1,2,3]});
+            });
+        });
     });
 
     describe("Logic Engine", function() {
