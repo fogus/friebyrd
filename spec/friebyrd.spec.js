@@ -180,10 +180,6 @@ describe("friebyrd", function() {
                 expect(c).toEqual([]);
             });
 
-            it("succeeds if l3 is the same as the concatenation of l1 and l2", function() {
-
-            });
-
         });
 
     });
