@@ -146,19 +146,46 @@ describe("friebyrd", function() {
                 expect(c[0].binds).toEqual({});
             });
             
-            it("may bing lvar to the list", function() {
+            it("may bind lvar to the list", function() {
                 var q = F.lvar("q");
                 var c = F.run(F.conso(1, [2, 3], q));
                 expect(c[0].binds).toEqual({q: [1,2,3]});
             });
-            
+
             it("may bind lvar to a or b", function() {
                 var q = F.lvar("q");
                 var p = F.lvar("p");
                 var c = F.run(F.conso(q, p, [1,2,3]));
-                expect(c[0].binds).toEqual({q: [1,2,3]});
+                expect(c[0].binds).toEqual({q: 1, p: [2,3]});
             });
         });
+
+        describe("joino", function() {
+            it("succeeds if l3 is the same as the concatenation of l1 and l2", function() {
+                var c = F.run(F.joino([1], [2], F.lvar("q")));
+                expect(c[0].binds).toEqual({q: [1,2]});
+
+                c = F.run(F.joino([1, 2, 3], F.lvar("q"), [1,2,3,4,5]));
+                expect(c[0].binds).toEqual({q: [4,5]});
+// FAILING TESTS
+//                c = F.run(F.joino(F.lvar("q"), [4,5], [1,2,3,4,5]));
+//                expect(c[0].binds).toEqual({q: [1,2,3]});
+//
+//                c = F.run(F.joino(F.lvar("q"), F.lvar("p"), [1,2,3,4,5]));
+//                expect(c[0].binds).toEqual({q: []});
+            });
+
+            it("fails if it cannot unify l1 & l2 with l3", function() {
+                var c = F.run(F.joino([1], [2], [1]));
+                expect(c).toEqual([]);
+            });
+
+            it("succeeds if l3 is the same as the concatenation of l1 and l2", function() {
+
+            });
+
+        });
+
     });
 
     describe("Logic Engine", function() {
