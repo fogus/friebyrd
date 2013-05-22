@@ -6,7 +6,7 @@ describe("friebyrd", function() {
         function f3(x) { return F.succeed(x + " f3"); }
         function no(x) { return []; }
         describe("disj", function() {
-            it("returns all the results of f1 and all the rsults of f2", function() {
+            it("returns all the results of f1 and all the results of f2", function() {
                 var rv = F.disj(f1, f2)("test1");
                 expect(rv).toEqual(["test1 f1", "test1 f2"]);
             });

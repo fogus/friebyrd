@@ -101,8 +101,8 @@ describe("mhkanren", function() {
                     var q = lvar("q");
                     var g = goal(q, true);
                     var r = g(ignorance);
-                    expect(r instanceof Array).toBe(true);
-                    expect(r[0].binds).toEqual({q: true});
+                    expect(pair(r)).toBe(true);
+                    expect(car(r).binds).toEqual({q: true});
                 });
             });
             
@@ -110,42 +110,41 @@ describe("mhkanren", function() {
         
         describe("choice", function() {
             it("succeeds (non-empty substitutions) if the element is a member of the list", function() {
-                var c = run(choice(2, [1,2,3]));
-                expect(c.length).toEqual(1);
-                expect(c[0].binds).toEqual({});
+                var c = run(choice(2, list(1,2,3)));
+                expect(car(c).binds).toEqual({});
             });
         
             it("fails (empty substitutions) if the element is not a member of the list", function() {
-                var c = run(choice(10, [1,2,3]));
-                expect(c).toEqual([]);
+                var c = run(choice(10, list(1,2,3)));
+                expect(isEmpty(c)).toBe(true);
             });
             
             it("returns a list of bindings that an lvar can take in the list", function() {
                 var q = lvar("q");
-                var c = run(choice(q, [1,2,3]));
-                expect(c.length).toEqual(3);
-                _.each(c, function(ch, i) {
-                    expect(ch.binds).toEqual({q: i+1});
-                });
+                var c = run(choice(q, list(1,2,3)));
+                expect(length(c)).toEqual(3);
+                expect(car(c).binds).toEqual({q: 1});
+                expect(car(cdr(c)).binds).toEqual({q: 2});
+                expect(car(cdr(cdr(c))).binds).toEqual({q: 3});
             });
         });
         
         describe("commono", function() {
             it("returns an lvar bound to the common element of two lists", function() {
-                var c = run(commono([1,2,3], [3,4,5]));
-                expect(c[0].binds).toEqual({x: 3}); 
+                var c = run(commono(list(1,2,3), list(3,4,5), "_.x"));
+                expect(car(c).binds).toEqual({x: 3});
             });
             
             it("returns bindings of an lvar to multiple common elements of two lists", function() {
-                var c = run(commono([1,2,3], [3,4,1,7]));
-                expect(c.length).toBe(2);
-                expect(c[0].binds).toEqual({x: 1}); 
-                expect(c[1].binds).toEqual({x: 3}); 
+                var c = run(commono(list(1,2,3), list(3,4,1,7)));
+                expect(length(c)).toBe(2);
+                expect(car(c).binds).toEqual({x: 1});
+                expect(car(cdr(c)).binds).toEqual({x: 3});
             });
             
             it("returns an empty list if there are no common elements", function() {
-                var c = run(commono([11,2,3], [13, 4, 1, 7]));
-                expect(c).toEqual([]); 
+                var c = run(commono(list(11,2,3), list(13, 4, 1, 7)));
+                expect(isEmpty(c)).toBe(true);
             });
             
         });
